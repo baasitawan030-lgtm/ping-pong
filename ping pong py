@@ -1,0 +1,382 @@
+import pygame
+import random
+pygame.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((800, 400))
+pygame.display.set_caption("ping pong game for uni")
+clock = pygame.time.Clock()
+up = 150
+speed = 20
+ai_speed = 4
+move = 150
+game = True
+ball_x = 400
+ball_y = 200
+ballx = 5
+bally = 3
+game_state = "menu"
+game_mode = None
+font = pygame.font.Font(None, 50)
+button1_rect = None
+button2_rect = None
+button3_rect = None
+button4_rect = None
+button5_rect = None
+button6_rect = None
+button7_rect = None
+hit = 0
+hit1=0
+glass1_broken = False
+glass2_broken = False
+bullets = []
+connect = False
+num = 1
+right_paddle_height = 70
+ai_velocity = 0
+gravity = 0.6
+flap_strength = -12
+ai_flapping = False
+ai_hit = False
+pygame.mixer.music.load("music1.mp3")
+pygame.mixer.music.set_volume(0.5)  
+pygame.mixer.music.play(-1)
+
+slider_x = 250        # start of track
+slider_y = 260        # vertical position
+slider_width = 300    # length of slider
+slider_height = 10    # track thickness
+slider_value = 0.5    # initial volume (0.0 to 1.0)
+dragging = False      # track if the user is dragging
+
+
+
+
+
+
+
+while game:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        mx, my = pygame.mouse.get_pos()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if slider_x <= mx <= slider_x + int(slider_width * slider_value) and slider_y - 5 <= my <= slider_y + slider_height + 5:
+                dragging = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            dragging = False
+        elif event.type == pygame.MOUSEMOTION and dragging:
+            slider_value = (mx - slider_x) / slider_width
+            slider_value = max(0, min(1, slider_value))  # clamp between 0 and 1
+            pygame.mixer.music.set_volume(slider_value)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+
+            if game_state == "menu" and button1_rect:
+                if button1_rect.collidepoint(mouse_pos):
+                    game_state = "playing"
+                    game_mode = "vs_ai"
+            if game_state == "menu" and button2_rect:
+                if button2_rect.collidepoint(mouse_pos):
+                    game_state = "playing"
+                    game_mode = "Hot_pototo"
+            if game_state == "menu" and button3_rect:
+                if button3_rect.collidepoint(mouse_pos):
+                    game_state = "playing"
+                    game_mode = "glass"
+            if game_state == "menu" and button4_rect:
+                if button4_rect.collidepoint(mouse_pos):
+                    game_state = "playing"
+                    game_mode = "Shooter"
+            if game_state == "menu" and button5_rect:
+                if button5_rect.collidepoint(mouse_pos):
+                    game_state = "settings"
+                    game_mode = "N/A"
+            if game_state == "settings" and button6_rect:
+                if button6_rect.collidepoint(mouse_pos):
+                    game_state = "settings"
+                    game_mode = "music"
+            if game_state == "settings" and button7_rect:
+                if button7_rect.collidepoint(mouse_pos):
+                    game_state = "settings"
+                    game_mode = "Volume"
+                    
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN and up < 320:
+                up += speed
+            elif event.key == pygame.K_UP and up > 0:
+                up -= speed
+            elif event.key == pygame.K_s:
+                bullet = pygame.Rect(8,up+33,10,4)
+                bullets.append(bullet)
+        
+                
+
+    screen.fill((0, 0, 0))
+
+    
+    
+    if game_state == "menu":
+        title_img = pygame.image.load("title.png").convert_alpha()
+        title_img = pygame.transform.scale(title_img,(300, 60))
+        title_rect = title_img.get_rect(center=(400, 40))  # center top
+        screen.blit(title_img, title_rect)
+        button_img = pygame.image.load("button1.png").convert_alpha()
+        button_img = pygame.transform.scale(button_img,(300, 60))
+        settings_img = pygame.image.load("settings.png").convert_alpha()
+        settings_img = pygame.transform.scale(settings_img, (50, 50))
+        button1_rect = button_img.get_rect(topleft=(250, 110))
+        screen.blit(button_img, button1_rect)
+        text1 = font.render("VS AI", True, (255, 255, 255))
+        screen.blit(text1, (320, 120))
+        button2_rect = button_img.get_rect(topleft=(250, 180))
+        screen.blit(button_img, button2_rect)
+        text2 = font.render("Hot_pototo", True, (255, 255, 255))
+        screen.blit(text2, (320, 190))
+        button3_rect = button_img.get_rect(topleft=(250, 320))
+        screen.blit(button_img, button3_rect)
+        text3 = font.render("glass", True, (255, 255, 255))
+        screen.blit(text3, (320, 330))
+        button4_rect = button_img.get_rect(topleft=(250,250))
+        screen.blit(button_img, button4_rect)
+        text4 = font.render("Shooter", True, (255, 255, 255))
+        screen.blit(text4, (320, 270))
+        button5_rect = settings_img.get_rect(topleft=(0, 0))
+        screen.blit(settings_img, button5_rect)
+
+    elif game_state =="settings" and game_mode =="N/A":
+        button_img = pygame.image.load("button1.png").convert_alpha()
+        button_img = pygame.transform.scale(button_img,(300, 60))
+        button6_rect = button_img.get_rect(topleft=(250, 110))
+        screen.blit(button_img, button6_rect)
+        text6 = font.render("Music", True, (255, 255, 255))
+        screen.blit(text6, (320, 120))
+        button7_rect = button_img.get_rect(topleft=(250, 180))
+        screen.blit(button_img, button7_rect)
+        text7 = font.render("Volume", True, (255, 255, 255))
+        screen.blit(text7, (320, 190))
+
+    elif game_state == "settings" and game_mode == "Volume":
+    # slider track
+        pygame.draw.rect(screen, (150,150,150), (250,260,300,10))
+    
+    # filled portion
+        pygame.draw.rect(screen, (0,255,0), (250,260,int(300*slider_value),10))
+    
+    # thumb
+        thumb_x = 250 + int(300*slider_value) - 5
+        pygame.draw.rect(screen, (255,255,255), (thumb_x, 255, 10, 20))
+    
+    # label
+        screen.blit(font.render("Volume", True, (255,255,255)), (250,230))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+    elif game_state == "playing" and game_mode == "Shooter":
+
+    
+        ball_x -= ballx
+        ball_y -= bally
+
+        left_paddle = pygame.Rect(8, up, 25, 70)
+        right_paddle = pygame.Rect(770, move, 25, right_paddle_height)
+        ball = pygame.Rect(ball_x - 12, ball_y - 12, 24, 24)
+
+        if ball_y <= 0 or ball_y >= 400:
+            bally *= -1
+
+        if ball_x <= 0 or ball_x >= 800:
+            ball_y = 200
+            ball_x = 400
+
+        if left_paddle.colliderect(ball) and ballx > 0:
+            ballx *= -1
+
+        if right_paddle.colliderect(ball) and ballx < 0:
+            ballx *= -1
+
+        ground = 400 - right_paddle_height
+
+   
+        for bullet in bullets[:]:  
+            bullet.x += 10
+            pygame.draw.rect(screen, (255, 255, 0), bullet)
+
+            if bullet.colliderect(right_paddle) and not ai_hit:
+                bullets.remove(bullet)
+                ai_velocity = 0  
+                move = ground     
+                ai_hit = True
+
+  
+        if not ai_hit:  
+  
+            if ball_y > move + right_paddle_height / 2 and move < ground:
+                move += ai_speed
+            elif ball_y < move + right_paddle_height / 2 and move > 0:
+                move -= ai_speed
+
+        else:
+            ai_velocity += gravity
+            move += ai_velocity
+
+            if move >= ground:
+               move = ground
+               ai_velocity = 0
+
+            if move <= 0:
+               move = 0
+               ai_velocity = 0
+
+    
+            if ball_x > 275: 
+                if ball_y + 12 < move: 
+                    ai_velocity = flap_strength
+
+
+        pygame.draw.circle(screen, (255, 0, 0), (ball_x, ball_y), 12)
+        pygame.draw.rect(screen, (255, 0, 0), (8, up, 25, 70))
+        pygame.draw.rect(screen, (255, 0, 0), (770, move, 25, right_paddle_height))
+
+   
+        for bullet in bullets:
+            pygame.draw.rect(screen, (255, 255, 0), bullet)
+
+  
+
+
+
+    
+    elif game_state == "playing" and game_mode =="vs_ai":
+        ball_x -= ballx
+        ball_y -= bally
+        left_paddle = pygame.Rect(8, up, 25, 70)
+        right_paddle = pygame.Rect(770, move, 25, 70)
+        ball = pygame.Rect(ball_x - 12, ball_y - 12, 24, 24)
+        
+        if ball_y <= 0 or ball_y >= 400:
+            bally *= -1
+        if ball_x <= 0 or ball_x >= 800:
+            ball_y = 200
+            ball_x = 400
+        if left_paddle.colliderect(ball) and ballx > 0:
+            ballx *= -1
+        if right_paddle.colliderect(ball) and ballx < 0:
+            ballx *= -1
+        if ball_x > 275:
+            if ball_y > move and move < 320:
+                move += ai_speed
+            if ball_y < move and move > 0:
+                move -= ai_speed
+     
+        
+        pygame.draw.circle(screen, (255, 0, 0), (ball_x, ball_y), 12)
+        pygame.draw.rect(screen, (255, 0, 0), (8, up, 25, 70))
+        pygame.draw.rect(screen, (255, 0, 0), (770, move, 25, 70))
+
+    elif game_state == "playing" and game_mode =="Hot_pototo":
+        ball_x -= ballx
+        ball_y -= bally
+        left_paddle = pygame.Rect(8, up, 25, 70)
+        right_paddle = pygame.Rect(770, move, 25, 70)
+        ball = pygame.Rect(ball_x - 12, ball_y - 12, 24, 24)
+        
+        if ball_y <= 0 or ball_y >= 400:
+            bally *= -1
+        if ball_x <= 0 or ball_x >= 800:
+            ball_y = 200
+            ball_x = 400
+            ballx=3
+            
+        if left_paddle.colliderect(ball) and ballx > 0:
+            ballx *= -1.1
+        if right_paddle.colliderect(ball) and ballx < 0:
+            ballx *= -1.1
+        if ball_x > 275:
+            if ball_y > move and move < 320:
+                move += ai_speed
+            if ball_y < move and move > 0:
+                move -= ai_speed
+        
+        pygame.draw.circle(screen, (255, 0, 0), (ball_x, ball_y), 12)
+        pygame.draw.rect(screen, (255, 0, 0), (8, up, 25, 70))
+        pygame.draw.rect(screen, (255, 0, 0), (770, move, 25, 70))  
+
+
+
+    elif game_state == "playing" and game_mode =="glass":
+        ball_x -= ballx
+        ball_y -= bally
+        left_paddle = pygame.Rect(8, up, 25, 70)
+        right_paddle = pygame.Rect(770, move, 25, 70)
+        ball = pygame.Rect(ball_x - 12, ball_y - 12, 24, 24)
+        glass1 = pygame.image.load("downloads/New Piskel-3.png").convert()
+        glass1 = pygame.transform.scale(glass1, (100, 100))
+        glass1_rect = glass1.get_rect(topleft=(400, 300))
+        glass2 = pygame.image.load("downloads/New Piskel-3.png").convert()
+        glass2 = pygame.transform.scale(glass2, (100, 100))
+        glass2_rect = glass2.get_rect(topleft=(200, 275))
+        
+        if ball_y <= 0 or ball_y >= 400:
+            bally *= -1
+        if ball_x <= 0 or ball_x >= 800:
+            ball_y = 200
+            ball_x = 400
+        if left_paddle.colliderect(ball) and ballx > 0:
+            ballx *= -1
+        if right_paddle.colliderect(ball) and ballx < 0:
+            ballx *= -1
+        if ball_x > 275:
+            if ball_y > move and move < 320:
+                move += ai_speed
+            if ball_y < move and move > 0:
+                move -= ai_speed
+        
+
+        if ball.colliderect(glass1_rect) and glass1_broken == False:
+             ballx *= -1
+             hit1 +=1
+             if ballx > 0:
+                ball_x = glass1_rect.left - 12
+             else:
+                ball_x = glass1_rect.right + 12
+
+        if ball.colliderect(glass2_rect) and glass2_broken == False:
+             ballx *= -1
+             hit +=1
+             if ballx > 0:
+                ball_x = glass2_rect.left - 12
+            
+             else:
+                ball_x = glass2_rect.right + 12
+        
+        if hit == 3:
+            glass2_broken = True
+        if hit1 ==3:
+            glass1_broken = True
+        
+        screen.fill((0,0,0))
+        pygame.draw.circle(screen, (255, 0, 0), (ball_x, ball_y), 12)
+        pygame.draw.rect(screen, (255, 0, 0), (8, up, 25, 70))
+        pygame.draw.rect(screen, (255, 0, 0), (770, move, 25, 70))
+        if not glass1_broken:
+            
+            screen.blit(glass1,(glass1_rect))
+        if not glass2_broken:
+            
+            screen.blit(glass2,(glass2_rect))
+
+
+    pygame.display.update()
+    clock.tick(60)
+
+
