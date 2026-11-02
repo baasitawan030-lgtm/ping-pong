@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+    th, td {
+        border-style: groove ;
+    }
+</style>
+    <meta charset="UTF-8">
+    <title>My qualifications</title>
+    <link rel="icon" type="image/png" href="picofme.png">
+    <link rel="stylesheet" href="mylife.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+    
+</head>
+<body>
+  <form>
+    <div class="search">
+      <span class="material-symbols-outlined">search</span>
+      <input class="search-input" type="search" placeholder="search">
+    </div>
+  </form>
+  </body>
+
+
+    <h1>What am i doing?</h1>
+    <p>I am a student at university of hertfordshire. I am currently studying computer science (cybersecurity and networks) my goal is to get into the
+        the field of cybersecurity to achieve this i have decided to persue other certificaitons alongside my degree such as: microsoft azure,secuirty + (comptia),
+        Cisco CCNA and ITLI 4 foundations these certifcaitons will allow me to stregnthen my foundations.
+    </p>
+    <table style="width:100%">
+        <tr>
+          <th>Course</th>
+          <th>info</th>
+          <th>What do I acheive?</th>
+        </tr>
+        <tr>
+          <td>microsoft azure</td>
+          <td>a course on the cloud fundamentals</td>
+          <td>gives myself a "birds eye view" on the field of cloud computing</td>
+        </tr>
+        <tr>
+          <td>comptia (security+)</td>
+          <td>a course that allows me to learn the fundamentals of security </td>
+          <td>good for Cvs </td>
+        </tr>
+        <tr>
+            <td>Cisco CCNA</td>
+            <td>a course on networking fundamentals </td>
+            <td>my goal is to become a penertration tester to become one I need to know and understand networks as I cannot break into something I do not knoe </td>
+          </tr>
+          <tr>
+            <td>ITLI 4 foundation</td>
+            <td>a course to improve consilatation </td>
+            <td>good for Cvs </td>
+          </tr>
+      </table>
+      <div class="recycle">
+        <span class="cert-slide active"><img src="pic1.png" alt="cert1"></span>
+        <span class="cert-slide"><img src="pic2.jpeg" alt="cert2"></span>
+        <span class="cert-slide"><img src="pic3.png" alt="cert3"></span>
+        <span class="cert-slide"><img src="pic4.png" alt="cert4"></span>
+      </div>
+      
+      <div class="controls">
+        <button class="nav-arrow left"><img src="pic10.png" alt="Previous"></button>
+        <button class="arrow-right"><img src="pic10.png" alt="Next"></button>
+      </div>
+      
+      <div class="member-info">
+        <div class="member-name">Certification Details</div>
+        <div class="member-role">Hover or click to view</div>
+      </div>
+      
+      <div class="dots">
+        <div class="dot active" data-index="0"></div>
+        <div class="dot" data-index="1"></div>
+        <div class="dot" data-index="2"></div>
+        <div class="dot" data-index="3"></div>
+      </div>
+
+    <script>
+      const slides = document.querySelectorAll('.recycle .cert-slide');
+      const dots = document.querySelectorAll('.dots .dot');
+      const nextBtn = document.querySelector('.arrow-right');
+      const prevBtn = document.querySelector('.nav-arrow.left');
+      let currentIndex = 0;
+      let slideInterval;
+    
+      function showSlide(index) {
+        // Safely wrap around the index for any number of slides
+        currentIndex = (index + slides.length) % slides.length;
+    
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        slides[currentIndex].classList.add('active');
+        if (dots[currentIndex]) {
+          dots[currentIndex].classList.add('active');
+        }
+      }
+    
+      function nextSlide() {
+        showSlide(currentIndex + 1);
+      }
+    
+      function prevSlide() {
+        showSlide(currentIndex - 1);
+      }
+    
+      // Auto-rotate every 3000 milliseconds (3 seconds)
+      function startTimer() {
+        slideInterval = setInterval(nextSlide, 1500);
+      }
+    
+      function resetTimer() {
+        clearInterval(slideInterval);
+        startTimer();
+      }
+    
+      // Button event listeners
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          nextSlide();
+          resetTimer();
+        });
+      }
+    
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          prevSlide();
+          resetTimer();
+        });
+      }
+    
+      // Clickable dots
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          showSlide(index);
+          resetTimer();
+        });
+      });
+    
+      // Start the auto-rotation loop
+      startTimer();
+    </script>
+
+
+    
+    
+    
+      
+   
+    
+
+
+
+      
+
+
+</body>
+</html>
